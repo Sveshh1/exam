@@ -10,16 +10,20 @@
 
   <style>
     html, body, a-scene {
-      margin: 0; padding: 0; overflow: hidden;
-      width: 100%; height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
       background: black;
       touch-action: none;
     }
+
     #info-panel {
       position: absolute;
       bottom: 10px;
       left: 10px;
-      background: rgba(0,0,0,0.7);
+      background: rgba(0, 0, 0, 0.7);
       color: white;
       padding: 12px;
       border-radius: 8px;
@@ -27,18 +31,20 @@
       z-index: 999;
       max-width: 320px;
     }
+
     #author {
       position: absolute;
       top: 10px;
       left: 10px;
       color: white;
-      background: rgba(0,0,0,0.5);
+      background: rgba(0, 0, 0, 0.5);
       padding: 8px;
       border-radius: 6px;
       font-size: 14px;
       font-family: sans-serif;
       z-index: 998;
     }
+
     #loading-message {
       position: absolute;
       top: 50%;
@@ -47,7 +53,7 @@
       color: white;
       font-family: sans-serif;
       font-size: 18px;
-      background: rgba(0,0,0,0.6);
+      background: rgba(0, 0, 0, 0.6);
       padding: 16px 24px;
       border-radius: 8px;
       z-index: 1000;
@@ -60,6 +66,7 @@
       margin-bottom: 8px;
       border-bottom: 1px solid #666;
     }
+
     .tab {
       flex: 1;
       text-align: center;
@@ -70,18 +77,52 @@
       user-select: none;
       transition: background 0.3s;
     }
+
     .tab.active {
       background: rgba(255, 255, 255, 0.3);
       font-weight: bold;
       border-bottom: 2px solid #fff;
     }
+
     .tab-content {
       display: none;
       font-size: 14px;
       line-height: 1.4em;
     }
+
     .tab-content.active {
       display: block;
+    }
+
+    /* Центровані повідомлення логів */
+    #log-container {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      z-index: 999;
+    }
+
+    .log-message {
+      background: rgba(0, 0, 0, 0.85);
+      color: #00ffcc;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 13px;
+      box-shadow: 0 0 8px rgba(0, 255, 200, 0.4);
+      opacity: 1;
+      animation: fadeOut 5s forwards;
+    }
+
+    @keyframes fadeOut {
+      0% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { opacity: 0; }
     }
   </style>
 </head>
@@ -103,7 +144,7 @@
     </div>
 
     <div id="trends" class="tab-content">
-      <p><em>Тут можна додати інформацію про тренди властивостей елемента...</em></p>
+      <p><em>Очікування даних...</em></p>
     </div>
 
     <div id="shells" class="tab-content">
@@ -111,93 +152,87 @@
     </div>
   </div>
 
+  <div id="log-container"></div>
   <div id="loading-message">Натисніть, щоб запустити AR та дозволити камеру</div>
 
   <a-scene mindar-image="imageTargetSrc: targets.mind;" embedded vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
     <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-    <!-- Маркери 0–5 -->
-   <a-entity mindar-image-target="targetIndex: 0">
-  <a-image src="src/1.png" position="0 0 0" width="1" height="1"></a-image>
-</a-entity>
-<a-entity mindar-image-target="targetIndex: 1">
-  <a-image src="src/2.png" position="0 0 0" width="1" height="1"></a-image>
-</a-entity>
-<a-entity mindar-image-target="targetIndex: 2">
-  <a-image src="src/3.png" position="0 0 0" width="1" height="1"></a-image>
-</a-entity>
-<a-entity mindar-image-target="targetIndex: 3">
-  <a-image src="src/4.png" position="0 0 0" width="1" height="1"></a-image>
-</a-entity>
-<a-entity mindar-image-target="targetIndex: 4">
-  <a-image src="src/5.png" position="0 0 0" width="1" height="1"></a-image>
-</a-entity>
-<a-entity mindar-image-target="targetIndex: 5">
-  <a-image src="src/6.png" position="0 0 0" width="1" height="1"></a-image>
-</a-entity>
-
+    <a-entity mindar-image-target="targetIndex: 0">
+      <a-image src="src/1.png" position="0 0 0" width="1" height="1"></a-image>
+    </a-entity>
+    <a-entity mindar-image-target="targetIndex: 1">
+      <a-image src="src/2.png" position="0 0 0" width="1" height="1"></a-image>
+    </a-entity>
+    <a-entity mindar-image-target="targetIndex: 2">
+      <a-image src="src/3.png" position="0 0 0" width="1" height="1"></a-image>
+    </a-entity>
   </a-scene>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      console.log("📦 DOM повністю завантажений");
+      const logContainer = document.getElementById("log-container");
 
-      const elements = {
-        0: {
-          name: "Hydrogen",
-          symbol: "H",
-          atomicNumber: 1,
-          shells: [1],
-          radius: "53 пм",
-          electronegativity: "2.20",
-          trends: "Гідроген має найнижчу атомну масу серед усіх елементів."
-        },
-        1: {
-          name: "Helium",
-          symbol: "He",
-          atomicNumber: 2,
-          shells: [2],
-          radius: "31 пм",
-          electronegativity: "—",
-          trends: "Гелій — інертний газ, не вступає в реакції за нормальних умов."
-        },
-        2: {
-          name: "Lithium",
-          symbol: "Li",
-          atomicNumber: 3,
-          shells: [2, 1],
-          radius: "167 пм",
-          electronegativity: "0.98",
-          trends: "Літій — легкий метал, активно реагує з водою."
-        },
-        3: {
-          name: "Carbon",
-          symbol: "C",
-          atomicNumber: 6,
-          shells: [2, 4],
-          radius: "67 пм",
-          electronegativity: "2.55",
-          trends: "Карбон — основа органічної хімії, входить до складу всього живого."
-        },
-        4: {
-          name: "Oxygen",
-          symbol: "O",
-          atomicNumber: 8,
-          shells: [2, 6],
-          radius: "48 пм",
-          electronegativity: "3.44",
-          trends: "Оксиген — сильний окисник, необхідний для дихання."
-        },
-        5: {
-          name: "Sodium",
-          symbol: "Na",
-          atomicNumber: 11,
-          shells: [2, 8, 1],
-          radius: "190 пм",
-          electronegativity: "0.93",
-          trends: "Натрій — дуже реакційноздатний метал, зберігається в маслі."
-        }
-      };
+      function addLog(message, emoji = "🔔") {
+        const time = new Date().toLocaleTimeString();
+        const log = document.createElement("div");
+        log.className = "log-message";
+        log.textContent = `[${time}] ${emoji} ${message}`;
+        logContainer.appendChild(log);
+
+        // Видалити після 5 секунд
+        setTimeout(() => {
+          log.remove();
+        }, 5000);
+      }
+
+      addLog("DOM повністю завантажений", "📦");
+
+     const elements = {
+  0: {
+    name: "Н – Гідроген",
+    symbol: "H",
+    atomicNumber: "1 / 1",
+    radius: "53 пм",
+    electronegativity: "2,2",
+    shells: `1S<sub>1</sub>, де 1 – номер енергетичного рівня, S – підрівень, 1 – число електронів на ньому`,
+    trends: `
+      <p><strong>Розміщення:</strong> IА група (до лужних металів), і VIIА група (до галогенів)</p>
+      <p><strong>Ступінь окиснення:</strong> 1, 0, -1</p>
+      <p><strong>Тренди властивостей:</strong><br>
+      Газ без кольору, запаху й смаку. Утворює ковалентні зв’язки в молекулах. Може виступати як відновник. Реагує з металами та неметалами.</p>
+    `
+  },
+  1: {
+    name: "Не – Гелій",
+    symbol: "He",
+    atomicNumber: "2 / 4",
+    radius: "31 пм",
+    electronegativity: "4,5",
+    shells: `1S<sub>2</sub>, де 1 – номер енергетичного рівня, S – підрівень, 2 – число електронів на ньому`,
+    trends: `
+      <p><strong>Розміщення:</strong> Головна підгрупа VIIIА групи (інертні гази)</p>
+      <p><strong>Ступінь окиснення:</strong> 0</p>
+      <p><strong>Тренди властивостей:</strong><br>
+      За нормальних умов є одноатомним газом, який легкий, хімічно інертний, без запаху, кольору та смаку. Не вступає в реакції з іншими елементами.</p>
+    `
+  },
+  2: {
+    name: "Be – Берилій",
+    symbol: "Be",
+    atomicNumber: "4 / 9",
+    radius: "112 пм",
+    electronegativity: "1,57",
+    shells: `1S<sub>2</sub> 2S<sub>2</sub>, де 1 – номер енергетичного рівня, S – підрівень, 2 – число електронів на ньому, 2 – номер енергетичного рівня, S – підрівень, 2 – число електронів`,
+    trends: `
+      <p><strong>Розміщення:</strong> Головна підгрупа ІІА групи</p>
+      <p><strong>Ступінь окиснення:</strong> 0, 1, 2</p>
+      <p><strong>Тренди властивостей:</strong><br>
+      Один із найтвердіших металів. Має високу теплопровідність. Немає запаху, а колір сріблясто-сірий. Виявляє як основні, так і кислотні властивості. Реагує з кислотами, киснем та лугами.</p>
+    `
+  }
+};
+
 
       const sceneEl = document.querySelector('a-scene');
       const loadingMessage = document.getElementById('loading-message');
@@ -208,7 +243,6 @@
       const electronegativity = document.getElementById("electronegativity");
       const trendsDiv = document.getElementById("trends");
 
-      // Вкладки
       document.querySelectorAll('.tab').forEach(tab => {
         tab.addEventListener('click', () => {
           document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -218,14 +252,13 @@
         });
       });
 
-      // Камера
       async function requestCameraAccess() {
         try {
           await navigator.mediaDevices.getUserMedia({ video: true });
-          console.log("📷 Доступ до камери отримано");
+          addLog("Доступ до камери отримано", "📷");
           return true;
         } catch (err) {
-          console.error("❌ Помилка доступу до камери:", err);
+          addLog("Помилка доступу до камери: " + err.message, "❌");
           alert("Доступ до камери відхилено або недоступний.");
           return false;
         }
@@ -251,24 +284,25 @@
           if (mindARSystem) {
             mindARSystem.start();
             loadingMessage.style.display = 'none';
+            addLog("MindAR запущено", "🚀");
           }
         });
       });
 
-      // Обробка знайдених маркерів
       const markerEntities = document.querySelectorAll('[mindar-image-target]');
       markerEntities.forEach((markerEntity, idx) => {
         markerEntity.addEventListener("targetFound", () => {
           const data = elements[idx];
           if (!data) return;
 
-          console.log(`🎯 Маркер знайдено! targetIndex = ${idx}`);
+          addLog(`Маркер знайдено! Елемент: ${data.symbol}`, "🎯");
+
           elName.innerText = `${data.symbol} - ${data.name}`;
           atomicNum.innerText = data.atomicNumber;
-          shells.innerText = data.shells.join(", ");
+          shells.innerHTML = data.shells;
           radius.innerText = data.radius;
           electronegativity.innerText = data.electronegativity;
-          trendsDiv.innerHTML = `<p>${data.trends || "Інформація відсутня."}</p>`;
+          trendsDiv.innerHTML = data.trends || "<p>Інформація відсутня.</p>";
         });
       });
     });
